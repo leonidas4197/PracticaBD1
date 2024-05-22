@@ -1,0 +1,89 @@
+package PracticaProgBD.Model;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import PracticaProgBD.utils.UtilsBD;
+
+public class ClubGolfDAO {
+
+public static final int ERROR_SQL_BORRAR= -1; 
+
+// Método para obtener un club de golf por su ID
+public ClubGolfDO obtenerClubGolfPorId(int idClubGolf) throws SQLException {
+    String sql = "SELECT * FROM ClubGolf WHERE idClubGolf = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setInt(1, idClubGolf);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                // Construir un objeto ClubGolfDO con los datos del ResultSet
+                ClubGolfDO clubGolf = new ClubGolfDO();
+                clubGolf.setIdClubGolf(rs.getInt("idClubGolf"));
+                clubGolf.setNombre(rs.getString("nombre"));
+                clubGolf.setLocalidad(rs.getString("localidad"));
+                clubGolf.setRecordGolpes(rs.getInt("recordGolpes"));
+                clubGolf.setEscuela(rs.getInt("escuela"));
+                return clubGolf;
+            } else {
+                return null; // No se encontró ningún club de golf con el ID especificado
+            }
+        }
+    }
+}
+
+// Método para modificar un campo de un club de golf
+public void modificarCampo(int idClubGolf, String campo, String nuevoValor) throws SQLException {
+    String sql = "UPDATE ClubGolf SET " + campo + " = ? WHERE idClubGolf = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setString(1, nuevoValor);
+        stmt.setInt(2, idClubGolf);
+        stmt.executeUpdate();
+    }
+}
+
+// Método para modificar un club de golf desde la terminal
+public void modificarClubDeGolf(Scanner scanner) {
+    try {
+        System.out.println("Ingrese el ID del club de golf:");
+        int idClubGolf = scanner.nextInt();
+        scanner.nextLine(); // Limpiar el buffer del scanner
+
+        ClubGolfDAO clubGolfDAO = new ClubGolfDAO();
+        ClubGolfDO clubGolf = clubGolfDAO.obtenerClubGolfPorId(idClubGolf);
+
+        if (clubGolf != null) {
+            System.out.println("Datos del club de golf:");
+            System.out.println("ID: " + clubGolf.getIdClubGolf());
+            System.out.println("Nombre: " + clubGolf.getNombre());
+            System.out.println("Localidad: " + clubGolf.getLocalidad());
+            System.out.println("Record de Golpes: " + clubGolf.getRecordGolpes());
+            System.out.println("Escuela: " + clubGolf.getEscuela());
+
+            System.out.println("Ingrese el nombre del campo a modificar:");
+            String campo = scanner.nextLine();
+
+            System.out.println("Ingrese el nuevo valor:");
+            String nuevoValor = scanner.nextLine();
+
+            clubGolfDAO.modificarCampo(clubGolf.getIdClubGolf(), campo, nuevoValor);
+            System.out.println("El campo se ha modificado exitosamente.");
+        } else {
+            System.out.println("No se encontró ningún club de golf con el ID especificado.");
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al intentar modificar el club de golf. Por favor, inténtelo de nuevo.");
+        e.printStackTrace();
+    } catch (Exception e) {
+        System.out.println("Error inesperado. Por favor, inténtelo de nuevo.");
+        e.printStackTrace();
+    }
+}
+}
