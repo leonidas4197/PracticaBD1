@@ -1,0 +1,58 @@
+package PracticaProgBD;
+
+import java.sql.SQLException;
+import java.util.Scanner;
+
+import PracticaProgBD.Model.ClubGolfDAO;
+import PracticaProgBD.Model.HoyoDAO;
+import PracticaProgBD.Model.SocioDAO;
+import PracticaProgBD.Model.SocioDO;
+import PracticaProgBD.utils.UtilsBD;
+
+public class GolfistaPlusUltra {
+	
+    public static void main(String[] args) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        SocioDAO socioDAO = new SocioDAO();
+        
+        int opcion = 0;
+        while (opcion != 5) {
+            System.out.println("**** Bienvenido a GolfistaPlusUltra ****");
+            System.out.println("**** Administración *******");
+            System.out.println("1. Alta de socios");
+            System.out.println("2. Modificar Club Golf");
+            System.out.println("3. Cálculos");
+            System.out.println("4. Eliminar Hoyo");
+            System.out.println("5. Salir");
+            System.out.println("Opción (1-5):");
+            opcion = scanner.nextInt();
+            switch (opcion) {
+                case 1:
+                    // Llamamos a la función para dar de alta a los socios
+                	SocioDAO.agregarNuevoSocio(scanner, socioDAO);
+                    break;
+                case 2:
+                    // Llamamos a la función para modificar el club de golf
+                	ClubGolfDAO clubGolfDAO = new ClubGolfDAO();
+                    clubGolfDAO.modificarClubDeGolf(scanner);
+                    break;
+                case 3:
+                    // Llamamos a la función para realizar cálculos
+                    break;
+                case 4:
+                    // Llamamos a la función para eliminar un hoyo por id
+                	//HoyoDAO.eliminarHoyoPorId(scanner);
+                	//Llamamos a la funcion para eliminar un hoyo por nombre
+                	HoyoDAO.eliminarHoyoPorNombre(scanner);
+                    break;
+                case 5:
+                    System.out.println("Saliendo del programa...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Por favor, elige una opción entre 1 y 5.");
+                    break;
+            }
+        }
+        scanner.close();
+    }
+}
