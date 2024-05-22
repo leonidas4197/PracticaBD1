@@ -1,0 +1,64 @@
+package PracticaProgBD.Model;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import PracticaProgBD.utils.UtilsBD;
+
+public class HoyoDAO {
+
+public static final int ERROR_SQL_BORRAR= -1; 
+
+//Metodo para eliminar un hoyo con el id
+public static void eliminarHoyoPorId(Scanner scanner) throws SQLException {
+    try {
+        System.out.println("Ingrese el ID del hoyo que desea eliminar:");
+        int idHoyo = scanner.nextInt();
+        scanner.nextLine(); // Consumir el salto de línea
+
+        String sql = "DELETE FROM Hoyo WHERE idHoyo = ?";
+        try (Connection con = UtilsBD.conectarBD();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, idHoyo);
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas > 0) {
+                System.out.println("Hoyo eliminado correctamente.");
+            } else {
+                System.out.println("No se encontró ningún hoyo con el ID especificado.");
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al intentar eliminar el hoyo. Por favor, inténtelo de nuevo.");
+        e.printStackTrace();
+    }
+}
+
+public static void eliminarHoyoPorNombre(Scanner scanner) throws SQLException {
+    try {
+        System.out.println("Ingresar el nombre del hoyo que desea eliminar:");
+        String nombre = scanner.nextLine();
+        scanner.nextLine();
+        
+        String sql = "DELETE FROM Hoyo WHERE nombre = ?";
+        try (Connection con = UtilsBD.conectarBD();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, nombre);
+            int filasAfectadas = stmt.executeUpdate();
+            if (filasAfectadas > 0) {
+                System.out.println("Hoyo '" + nombre + "' eliminado correctamente.");
+            } else {
+                System.out.println("No se encontró ningún hoyo con el nombre '" + nombre + "'.");
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error al intentar eliminar el hoyo. Por favor, inténtelo de nuevo.");
+        e.printStackTrace();
+    }
+}
+}
