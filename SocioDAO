@@ -1,0 +1,135 @@
+package PracticaProgBD.Model;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import PracticaProgBD.utils.UtilsBD;
+
+public class SocioDAO {
+
+public static final int ERROR_SQL_BORRAR= -1; 
+	
+
+// Método para agregar un socio
+public void agregarSocio(SocioDO socio) throws SQLException {
+    String sql = "INSERT INTO Socio (idSocio, nombre, edad, sexo, cuota) VALUES (?, ?, ?, ?, ?)";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setInt(1, socio.getIdSocio());
+        stmt.setString(2, socio.getNombre());
+        stmt.setInt(3, socio.getEdad());
+        stmt.setInt(4, socio.getSexo());
+        stmt.setInt(5, socio.getCuota());
+        stmt.executeUpdate();
+    }
+}
+
+// Método para borrar un socio por ID
+public void borrarSocioPorId(int idSocio) throws SQLException {
+    String sql = "DELETE FROM Socio WHERE idSocio = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setInt(1, idSocio);
+        stmt.executeUpdate();
+    }
+}
+
+// Método para borrar un socio por nombre
+public void borrarSocioPorNombre(String nombre) throws SQLException {
+    String sql = "DELETE FROM Socio WHERE nombre = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setString(1, nombre);
+        stmt.executeUpdate();
+    }
+}
+
+// Método para obtener un socio por ID
+public SocioDO obtenerSocioPorId(int idSocio) throws SQLException {
+    String sql = "SELECT * FROM Socio WHERE idSocio = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setInt(1, idSocio);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return new SocioDO(
+                    rs.getInt("idSocio"),
+                    rs.getString("nombre"),
+                    rs.getInt("edad"),
+                    rs.getInt("sexo"),
+                    rs.getInt("cuota")
+                );
+            } else {
+                return null;
+            }
+        }
+    }
+}
+
+// Método para obtener todos los socios
+public List<SocioDO> obtenerTodosLosSocios() throws SQLException {
+    String sql = "SELECT * FROM Socio";
+    List<SocioDO> socios = new ArrayList<>();
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+            socios.add(new SocioDO(
+                rs.getInt("idSocio"),
+                rs.getString("nombre"),
+                rs.getInt("edad"),
+                rs.getInt("sexo"),
+                rs.getInt("cuota")
+            ));
+        }
+    }
+    return socios;
+}
+
+// Método para actualizar un socio
+public void actualizarSocio(SocioDO socio) throws SQLException {
+    String sql = "UPDATE Socio SET nombre = ?, edad = ?, sexo = ?, cuota = ? WHERE idSocio = ?";
+    try (Connection con = UtilsBD.conectarBD();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setString(1, socio.getNombre());
+        stmt.setInt(2, socio.getEdad());
+        stmt.setInt(3, socio.getSexo());
+        stmt.setInt(4, socio.getCuota());
+        stmt.setInt(5, socio.getIdSocio());
+        stmt.executeUpdate();
+    }
+}
+public static void agregarNuevoSocio(Scanner scanner, SocioDAO socioDAO) {
+    try {
+        System.out.println("Ingrese el ID del socio:");
+        int idSocio = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Ingrese el nombre del socio:");
+        String nombre = scanner.nextLine();
+
+        System.out.println("Ingrese la edad del socio:");
+        int edad = scanner.nextInt();
+
+        System.out.println("Ingrese el sexo del socio (0 para masculino, 1 para femenino):");
+        int sexo = scanner.nextInt();
+
+        System.out.println("Ingrese la cuota del socio:");
+        int cuota = scanner.nextInt();
+
+        SocioDO nuevoSocio = new SocioDO(idSocio, nombre, edad, sexo, cuota);
+        socioDAO.agregarSocio(nuevoSocio);
+
+        System.out.println("¡Socio agregado exitosamente!");
+    } catch (SQLException e) {
+        System.out.println("Error al agregar el socio. Por favor, inténtelo de nuevo.");
+        e.printStackTrace();
+    }
+}
+}
